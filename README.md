@@ -3,7 +3,7 @@ This guide will only have instructions for a Linux host, if you're on Windows, y
 # Table of contents:
 1. [Steps](#steps)
 2. [Bonus Steps](#bonus-steps)
-3. [Porting save files](#porting-existing-save-files)
+3. [Porting save data](#porting-save-data)
 4. [Editing save data](#editing-save-data)
 ## Requirements
 * A copy of OMORI v1.0.8
