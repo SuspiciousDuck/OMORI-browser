@@ -2,8 +2,9 @@
 This guide will only have instructions for a Linux host, if you're on Windows, you can use WSL.
 # Table of contents:
 1. [Steps](#steps)
-2. [Minify files](#bonus-steps-minify-files-to-decrease-network-load)
-3. [Delete encrypted files](#bonus-steps-save-on-storage-space-by-deleting-encrypted-files-if-present)
+2. [Bonus Steps](#bonus-steps)
+3. [Porting save files](#porting-existing-save-files)
+4. [Editing save data](#editing-save-data)
 ## Requirements
 * A copy of OMORI v1.0.8
 * sed - for utility script that fixes file names
@@ -41,7 +42,8 @@ bash ./replace.sh ~/OMORI
 # IMPORTANT: you MUST run it in the OMORI root directory
 node ./replace.js
 ```
-## Bonus steps: Minify files to decrease network load
+## Bonus Steps
+### Minify files to decrease network load
 ### Requirements:
 * jq - to compress JSON files
 * yq - to compress YAML files
@@ -54,7 +56,7 @@ node ./replace.js
 # you should probably make a copy before running this
 bash ./compress.sh ~/OMORI
 ```
-## Bonus steps: Save on storage space by deleting encrypted files (if present)
+### Save on storage space by deleting encrypted files (if present)
 ```bash
 # assuming you're in the OMORI root directory
 find ./www/ \( -name "*.rpgmvp" -o -name "*.rpgmvo" -o -name "*.KEL" -o -name "*.AUBREY" -o -name "*.HERO" -o -name "*.PLUTO" \) -exec rm {} \;
@@ -80,3 +82,40 @@ example.com {
 ```bash
 caddy run
 ```
+## Porting save data
+You can find your save data in `OMORI root folder/www/save`
+```
+# example files
+$ ls ~/OMORI/www/save
+config.rpgsave file1.rpgsave global.rpgsave TITLEDATA
+```
+The patched OMORI uses localStorage in order to save your data. In order to set your save data manually, you must run `window.localStorage.setItem("key", "value");` in your browser's console.<br>
+This is a table which shows what you'd set as "key"
+|filename|key|
+|-|-|
+|TITLEDATA|TITLEDATA|
+|global.rpgsave|RPG Global|
+|config.rpgsave|RPG Config|
+|fileX.rpgsave|RPG FileX|
+
+This is an example for manually setting savedata
+```javascript
+window.localStorage.setItem("TITLEDATA", "445");
+```
+### Editing save data
+All of the files which end with `.rpgsave` are all Base64 encoded. However, it appears its not standard, so you can't use any generic decoder.
+1. Enter OMORI in your web browser
+2. In your browser's console, run `JSON.parse(LZString.decompressFromBase64(data))`, but replace `data` with the contents of your file in quotes(")<br>
+Example output:
+```
+JSON.parse(LZString.decompressFromBase64("NoOwrgNhA0DeBEBzC..."))
+{
+  "globalId": "RPGMV",
+  "title": "OMORI",
+  (...)
+}
+```
+3. Change the values you wish to edit
+4. Run `LZString.compressToBase64(JSON.stringify(object))`, where `object` is your edited save data
+5. Save the output using `window.localStorage.setItem(key, data)` (remember to wrap the arguments in quotes)
+6. Reload the site to see your new changes
