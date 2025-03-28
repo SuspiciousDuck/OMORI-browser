@@ -27,7 +27,7 @@ rm www/js/libs/greenworks* \
 ```bash
 # assuming OMORI.patch is in the current directory
 # make sure you're in the OMORI root folder
-patch -p1 --dry-run < OMORI.patch
+patch -p1 < OMORI.patch
 ```
 5. Run first utility script to fix some errors
 ```bash
